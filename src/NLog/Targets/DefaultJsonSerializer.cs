@@ -46,9 +46,15 @@ namespace NLog.Targets
     /// </summary>
     public class DefaultJsonSerializer : IJsonSerializer, NLog.StructuredEvents.Serialization.ISerializer
     {
+        /// <summary>
+        /// JSON 5?
+        /// </summary>
+        private bool inJson5Mode = false;
+
         private const int MaxRecursionDepth = 10;
 
         private static readonly DefaultJsonSerializer instance;
+        private static readonly DefaultJsonSerializer json5Instance;
 
         /// <summary>
         /// Singleton instance of the serializer.
@@ -58,13 +64,23 @@ namespace NLog.Targets
             get { return instance; }
         }
 
-        static DefaultJsonSerializer()
+        /// <summary>
+        /// Singleton instance of the serializer.
+        /// </summary>
+        public static DefaultJsonSerializer Json5Instance
         {
-            instance = new DefaultJsonSerializer();
+            get { return json5Instance; }
         }
 
-        private DefaultJsonSerializer()
+        static DefaultJsonSerializer()
         {
+            instance = new DefaultJsonSerializer(false);
+            json5Instance = new DefaultJsonSerializer(true);
+        }
+
+        private DefaultJsonSerializer(bool inJson5Mode)
+        {
+            this.inJson5Mode = inJson5Mode;
         }
 
         /// <summary>
@@ -158,17 +174,39 @@ namespace NLog.Targets
 
                 return formattable.ToString("{0}", format);
             }
-            //else
-            //{
-            //    try
-            //    {
-            //        return new ObjectSerializer(this).SerializeObjectProperties(value, objectsInPath, depth, format);
-            //    }
-            //    catch
-            //    {
-            //        return null;
-            //    }
-            //}
+            else if (inJson5Mode)
+            {
+                var type = value.GetType();
+                if (IsNumericTypeCode(Type.GetTypeCode(type)))
+                {
+#if SILVERLIGHT
+                var culture = new CultureInfo("en-US").NumberFormat;
+#else
+                    var culture = new CultureInfo("en-US", false).NumberFormat;
+#endif
+                    culture.NumberGroupSeparator = string.Empty;
+                    culture.NumberDecimalSeparator = ".";
+                    culture.NumberGroupSizes = new int[] { 0 };
+                    return string.Format(culture, "{0}", value);
+                }
+                if (type == typeof(bool))
+                {
+                    return value.ToString();
+                }
+                if (type == typeof(char))
+                {
+                    return "'" + value.ToString() + "'";
+                }
+
+                try
+                {
+                    return new ObjectSerializer(this).SerializeObjectProperties(value, objectsInPath, depth, format);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
             else
             {
                 TypeCode objTypeCode = Convert.GetTypeCode(value);
@@ -192,16 +230,22 @@ namespace NLog.Targets
         internal static string JsonStringEncode(object value, TypeCode objTypeCode, bool escapeUnicode, out bool encodeString)
         {
             string stringValue = Internal.XmlHelper.XmlConvertToString(value, objTypeCode);
-            if (objTypeCode != TypeCode.String || stringValue == null)
+
+            if (stringValue == null)
             {
                 encodeString = false;
-                if (stringValue == null)
-                    return stringValue;
-                else if (objTypeCode == TypeCode.Empty)
+                return null;
+            }
+
+            if (objTypeCode != TypeCode.String)
+            {
+                encodeString = false;
+                
+                if (objTypeCode == TypeCode.Empty)
                     return stringValue; // Don't put quotes around null values
-                else if (objTypeCode == TypeCode.Boolean)
+                if (objTypeCode == TypeCode.Boolean)
                     return stringValue; // Don't put quotes around boolean values
-                else if (IsNumericTypeCode(objTypeCode))
+                if (IsNumericTypeCode(objTypeCode))
                     return stringValue; // Don't put quotes around numeric values
             }
 

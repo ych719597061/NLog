@@ -107,7 +107,7 @@ namespace NLog
         static LogFactory()
         {
 
-            StructuredEvents.Serialization.SerializationManager.DefaultSerializer = DefaultJsonSerializer.Instance;
+            StructuredEvents.Serialization.SerializationManager.DefaultSerializer = DefaultJsonSerializer.Json5Instance;
             RegisterEvents(CurrentAppDomain);
         }
 #endif
