@@ -77,21 +77,14 @@ namespace NLog.Layouts
         public bool RenderEmptyObject { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsContext"/> dictionary.
-        /// </summary>
-        public bool IncludeMdc { get; set; }
-
-#if NET4_0 || NET4_5
-        /// <summary>
-        /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsLogicalContext"/> dictionary.
-        /// </summary>
-        public bool IncludeMdlc { get; set; }
-#endif
-
-        /// <summary>
         /// Gets or sets the option to include all properties from the log events
         /// </summary>
         public bool IncludeAllProperties { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsContext"/> dictionary.
+        /// </summary>
+        public bool IncludeMdc { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsContext"/> stack.
@@ -99,11 +92,18 @@ namespace NLog.Layouts
         /// <docgen category='Payload Options' order='10' />
         public bool IncludeNdc { get; set; }
 
+#if NET4_0 || NET4_5
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsLogicalContext"/> dictionary.
+        /// </summary>
+        public bool IncludeMdlc { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsLogicalContext"/> stack.
         /// </summary>
         /// <docgen category='Payload Options' order='10' />
         public bool IncludeNdlc { get; set; }
+#endif
 
         /// <summary>
         /// List of property names to exclude when <see cref="IncludeAllProperties"/> is true

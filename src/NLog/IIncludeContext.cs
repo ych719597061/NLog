@@ -38,26 +38,14 @@ namespace NLog
     /// </summary>
     public interface IIncludeContext
     {
+
+
+
         /// <summary>
         /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsContext"/> dictionary.
         /// </summary>
         /// <docgen category='Payload Options' order='10' />
         bool IncludeMdc { get; set; }
-
-
-#if NET4_0 || NET4_5
-        /// <summary>
-        /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsLogicalContext"/> dictionary.
-        /// </summary>
-        /// <docgen category='Payload Options' order='10' />
-        bool IncludeMdlc { get; set; }
-#endif
-
-        /// <summary>
-        /// Gets or sets the option to include all properties from the log events
-        /// </summary>
-        /// <docgen category='Payload Options' order='10' />
-        bool IncludeAllProperties { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsContext"/> stack.
@@ -66,9 +54,26 @@ namespace NLog
         bool IncludeNdc { get; set; }
 
         /// <summary>
+        /// Gets or sets the option to include all properties from the log events
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        bool IncludeAllProperties { get; set; }
+
+#if NET4_0 || NET4_5
+
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="MappedDiagnosticsLogicalContext"/> dictionary.
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        bool IncludeMdlc { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsLogicalContext"/> stack.
         /// </summary>
         /// <docgen category='Payload Options' order='10' />
         bool IncludeNdlc { get; set; }
+
+#endif
     }
 }

@@ -31,6 +31,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+using System.Linq;
+
 namespace NLog
 {
 #if NET4_0 || NET4_5
@@ -58,10 +60,29 @@ namespace NLog
         }
 
         /// <summary>
+        /// Pops the top message off the NDLC stack.
+        /// </summary>
+        /// <returns>The top message which is no longer on the stack.</returns>
+        public static string Pop()
+        {
+            return Pop(null);
+        }
+
+        /// <summary>
+        /// Pops the top message from the NDLC stack.
+        /// </summary>
+        /// <param name="formatProvider">The <see cref="IFormatProvider"/> to use when converting the value to a string.</param>
+        /// <returns>The top message, which is removed from the stack, as a string value.</returns>
+        public static string Pop(IFormatProvider formatProvider)
+        {
+            return FormatHelper.ConvertToString(PopObject(), formatProvider);
+        }
+
+        /// <summary>
         /// Pops the top message off the current stack
         /// </summary>
         /// <returns>The top message which is no longer on the stack.</returns>
-        public static object Pop()
+        public static object PopObject()
         {
             var current = GetThreadLocal();
             if (current != null)
@@ -75,6 +96,25 @@ namespace NLog
         public static void Clear()
         {
             SetThreadLocal(null);
+        }
+
+        /// <summary>
+        /// Gets all messages on the stack.
+        /// </summary>
+        /// <returns>Array of strings on the stack.</returns>
+        public static string[] GetAllMessages()
+        {
+            return GetAllMessages(null);
+        }
+
+        /// <summary>
+        /// Gets all messages from the stack, without removing them.
+        /// </summary>
+        /// <param name="formatProvider">The <see cref="IFormatProvider"/> to use when converting a value to a string.</param>
+        /// <returns>Array of strings.</returns>
+        public static string[] GetAllMessages(IFormatProvider formatProvider)
+        {
+            return GetAllObjects().Select((o) => FormatHelper.ConvertToString(o, formatProvider)).ToArray();
         }
 
         /// <summary>
@@ -182,7 +222,7 @@ namespace NLog
 
             void IDisposable.Dispose()
             {
-                Pop();
+                PopObject();
             }
 
             public override string ToString()

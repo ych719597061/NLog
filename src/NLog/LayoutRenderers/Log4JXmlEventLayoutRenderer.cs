@@ -153,6 +153,19 @@ namespace NLog.LayoutRenderers
         /// </summary>
         /// <docgen category='Payload Options' order='10' />
         public bool IncludeMdlc { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsLogicalContext"/> stack.
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        public bool IncludeNdlc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the NDLC item separator.
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        [DefaultValue(" ")]
+        public string NdlcItemSeparator { get; set; }
 #endif
 
         /// <summary>
@@ -166,13 +179,7 @@ namespace NLog.LayoutRenderers
         /// </summary>
         /// <docgen category='Payload Options' order='10' />
         public bool IncludeNdc { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsLogicalContext"/> stack.
-        /// </summary>
-        /// <docgen category='Payload Options' order='10' />
-        public bool IncludeNdlc { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the NDC item separator.
         /// </summary>
@@ -181,12 +188,7 @@ namespace NLog.LayoutRenderers
         public string NdcItemSeparator { get; set; }
 
 
-        /// <summary>
-        /// Gets or sets the NDLC item separator.
-        /// </summary>
-        /// <docgen category='Payload Options' order='10' />
-        [DefaultValue(" ")]
-        public string NdlcItemSeparator { get; set; }
+
 
         private readonly string machineName;
 
@@ -247,10 +249,12 @@ namespace NLog.LayoutRenderers
                 {
                     xtw.WriteElementSafeString("log4j", "NDC", dummyNamespace, string.Join(this.NdcItemSeparator, NestedDiagnosticsContext.GetAllMessages()));
                 }
+#if NET4_0 || NET4_5
                 if (this.IncludeNdlc)
                 {
-                    xtw.WriteElementSafeString("log4j", "NDLC", dummyNamespace, string.Join(this.NdcItemSeparator, NestedDiagnosticsLogicalContext.GetAllObjects()));
+                    xtw.WriteElementSafeString("log4j", "NDLC", dummyNamespace, string.Join(this.NdlcItemSeparator, NestedDiagnosticsLogicalContext.GetAllMessages()));
                 }
+#endif
 
                 if (logEvent.Exception != null)
                 {
