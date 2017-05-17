@@ -87,7 +87,7 @@ namespace NLog.Targets
         /// <returns>
         /// Serialized value.
         /// </returns>
-        private string SerializeObject(object value, bool escapeUnicode, HashSet<object> objectsInPath, int depth)
+        private static string SerializeObject(object value, bool escapeUnicode, HashSet<object> objectsInPath, int depth)
         {
             if (objectsInPath != null && objectsInPath.Contains(value))
             {
@@ -128,18 +128,8 @@ namespace NLog.Targets
             {
                 if (depth == MaxRecursionDepth) return null;        // reached maximum recursion level, no further serialization
 
-                var list = new List<string>();
-                var set = new HashSet<object>(objectsInPath ?? (IEnumerable<object>)Internal.ArrayHelper.Empty<object>()) { value };
-                foreach (var val in enumerable)
-                {
-                    var valueJson = SerializeObject(val, escapeUnicode, set, depth + 1);
-                    if (valueJson != null)
-                    {
-                        list.Add(valueJson);
-                    }
-                }
 
-                return string.Concat("[", string.Join(",", list.ToArray()), "]");
+                return JsonArrayEncode(enumerable, escapeUnicode, objectsInPath, depth);
             }
             else
             {
@@ -151,6 +141,34 @@ namespace NLog.Targets
                 else
                     return escapeXmlString;
             }
+        }
+
+        /// <summary>
+        /// Converts array of string/object values into JSON escaped string
+        /// </summary>
+        public static string JsonArrayEncode(IEnumerable value, bool escapeUnicode)
+        {
+            return JsonArrayEncode(value, escapeUnicode, null, 0);
+        }
+
+        /// <summary>
+        /// Converts array of string/object values into JSON escaped string
+        /// </summary>
+        private static string JsonArrayEncode(IEnumerable value, bool escapeUnicode, HashSet<object> objectsInPath, int depth)
+        {
+            var set = new HashSet<object>(objectsInPath ?? (IEnumerable<object>) Internal.ArrayHelper.Empty<object>()) { value };
+
+            var list = new List<string>();
+            foreach (var val in value)
+            {
+                var valueJson = SerializeObject(val, escapeUnicode, set, depth + 1);
+                if (valueJson != null)
+                {
+                    list.Add(valueJson);
+                }
+            }
+
+            return string.Concat("[", string.Join(",", list.ToArray()), "]");
         }
 
         /// <summary>
@@ -168,7 +186,7 @@ namespace NLog.Targets
             {
                 encodeString = false;
                 if (stringValue == null)
-                    return stringValue;
+                    return null;
                 else if (objTypeCode == TypeCode.Empty)
                     return stringValue; // Don't put quotes around null values
                 else if (objTypeCode == TypeCode.Boolean)

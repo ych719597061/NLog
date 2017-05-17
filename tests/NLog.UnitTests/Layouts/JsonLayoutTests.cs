@@ -475,6 +475,35 @@ namespace NLog.UnitTests.Layouts
         }
 #endif
 
+#if NET4_0 || NET4_5
+        [Fact]
+        public void IncludeNdlcJsonProperties()
+        {
+           
+            var jsonLayout = new JsonLayout()
+            {
+                IncludeNdlc = true
+            };
+
+            var logEventInfo = CreateLogEventWithExcluded();
+
+            NestedDiagnosticsLogicalContext.Clear();
+
+            NestedDiagnosticsLogicalContext.Push("a");
+            NestedDiagnosticsLogicalContext.Push("b");
+            NestedDiagnosticsLogicalContext.Push("c");
+            
+            logEventInfo.Properties.Clear();
+
+            var json = jsonLayout.Render(logEventInfo);
+            Assert.Equal("{ \"ndlc\": [\"c\",\"b\",\"a\"] }", json);
+
+            NestedDiagnosticsLogicalContext.Pop();
+            var json2 = jsonLayout.Render(logEventInfo);
+            Assert.Equal("{ \"ndlc\": [\"b\",\"a\"] }", json2);
+        }
+#endif
+
         /// <summary>
         /// Test from XML, needed for the list (ExcludeProperties)
         /// </summary>

@@ -163,6 +163,11 @@ namespace NLog.Layouts
                 }
             }
 
+            if (this.IncludeNdc)
+            {
+                AppendJsonList(sb, NestedDiagnosticsContext.GetAllObjects(), "ndc");
+            }
+
 
 #if NET4_0 || NET4_5
             if (this.IncludeMdlc)
@@ -174,6 +179,11 @@ namespace NLog.Layouts
                     object propertyValue = MappedDiagnosticsLogicalContext.GetObject(key);
                     AppendJsonPropertyValue(key, propertyValue, sb);
                 }
+            }
+
+            if (this.IncludeNdlc)
+            {
+                AppendJsonList(sb, NestedDiagnosticsLogicalContext.GetAllObjects(), "ndlc");
             }
 #endif
 
@@ -197,6 +207,8 @@ namespace NLog.Layouts
             CompleteJsonMessage(sb);
         }
 
+
+
         private void CompleteJsonMessage(StringBuilder sb)
         {
             if (sb.Length > 0)
@@ -213,6 +225,13 @@ namespace NLog.Layouts
             {
                 AppendJsonAttributeValue(propName, propStringEncode, propStringValue, sb);
             }
+        }
+
+        private void AppendJsonList(StringBuilder sb, object[] allObjects, string propName)
+        {
+            var json = Targets.DefaultJsonSerializer.JsonArrayEncode(allObjects, true);
+            AppendJsonAttributeValue(propName, false, json, sb);
+
         }
 
         private void AppendJsonAttributeValue(string attributeName, bool attributeEncode, string text, StringBuilder sb)
