@@ -65,7 +65,7 @@ namespace NLog.Targets
     /// </p>
     /// </example>
     [Target("NLogViewer")]
-    public class NLogViewerTarget : NetworkTarget
+    public class NLogViewerTarget : NetworkTarget, IIncludeContext
     {
         private readonly Log4JXmlEventLayout layout = new Log4JXmlEventLayout();
 
@@ -166,6 +166,27 @@ namespace NLog.Targets
         {
             get { return this.Renderer.IncludeNdc; }
             set { this.Renderer.IncludeNdc = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsLogicalContext"/> stack.
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        public bool IncludeNdlc
+        {
+            get { return this.Renderer.IncludeNdlc; }
+            set { this.Renderer.IncludeNdlc = value; }
+        }
+
+
+        /// <summary>
+        /// Gets or sets the option to include all properties from the log events
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        public bool IncludeAllProperties
+        {
+            get { return this.Renderer.IncludeAllProperties; }
+            set { this.Renderer.IncludeAllProperties = value; }
         }
 
         /// <summary>

@@ -31,6 +31,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+using NLog.LayoutRenderers;
+
 namespace NLog.Layouts
 {
     using System;
@@ -44,7 +46,7 @@ namespace NLog.Layouts
     [Layout("JsonLayout")]
     [ThreadAgnostic]
     [AppDomainFixedOutput]
-    public class JsonLayout : Layout
+    public class JsonLayout : Layout, IIncludeContext
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonLayout"/> class.
@@ -90,6 +92,18 @@ namespace NLog.Layouts
         /// Gets or sets the option to include all properties from the log events
         /// </summary>
         public bool IncludeAllProperties { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsContext"/> stack.
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        public bool IncludeNdc { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include contents of the <see cref="NestedDiagnosticsLogicalContext"/> stack.
+        /// </summary>
+        /// <docgen category='Payload Options' order='10' />
+        public bool IncludeNdlc { get; set; }
 
         /// <summary>
         /// List of property names to exclude when <see cref="IncludeAllProperties"/> is true
@@ -148,6 +162,7 @@ namespace NLog.Layouts
                     AppendJsonPropertyValue(key, propertyValue, sb);
                 }
             }
+
 
 #if NET4_0 || NET4_5
             if (this.IncludeMdlc)
