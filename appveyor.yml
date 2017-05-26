@@ -2,7 +2,7 @@ version: 4.4.{build}
 clone_folder: c:\projects\nlog
 environment:
   github_auth_token:
-    secure: pZlYWxnQ2TQk3DovT9MCkWU7AeGWVxwwcJ9dZeeiYYGCduJOOga3hQZrmOGi9yFX
+    secure: 6xg8DA/aYYWm64qjR7jFBRTQdZs11o+WlTt8DoClZNgVXmRIrHFH10F2ypXQxBBM
   sonar_token:
     secure: GBaeujJgXPbcDto3kyJXpwrTJdPNKNOjwzyzAGNvvKYg+X/S3anpG+8qKMBjjGFI
 
